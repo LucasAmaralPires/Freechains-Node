@@ -48,10 +48,10 @@ More Information:
 
 /*
  * TODO:
- * Implementar conversa com host para 'chain'
+ * Implementar conversa com host para 'chain' (heads, get, post, traverse, like, dislike and listen)
+ * Testar chain reps
  * Testar chains listen
  * Detectar quando host não esta funcionando
- * Testar freechains-host start
  * Colocar as opções disponíveis (host, port(client), port(host), sign, encypto, decrypt e why)
  */
  
@@ -136,7 +136,7 @@ function command_freechains_host (arg)
 	switch (arg[1])
 	{
 		case "start":
-			assert_size([2,3], arg.lenght, "Invalid Number of Arguments");
+			assert_size([2,3], arg.length, "Invalid Number of Arguments");
 			const { exec } = require("child_process");
 			exec("freechains-host start " + arg[2] + " &", (stdout) => {
 				console.log(stdout);
@@ -231,8 +231,8 @@ function command_freechains (arg)
 			switch(arg[3])
 			{
 				case "genesis":
-//				assert_size([4,5], arg.length, "Invalid Number of Arguments");
-				//codigo
+				assert_size([4], arg.length, "Invalid Number of Arguments");
+				socket_connection(addr, port, PRE + " chain " + chain + " genesis\n");
 				break;
 				case "heads":
 //				assert_size([4,5], arg.length, "Invalid Number of Arguments");
@@ -251,8 +251,8 @@ function command_freechains (arg)
 				//codigo
 				break;
 				case "reps":
-//				assert_size([4,5], arg.length, "Invalid Number of Arguments");
-				//codigo
+				assert_size([5], arg.length, "Invalid Number of Arguments");
+				socket_connection(addr, port, PRE + " chain " + chain + " reps " + arg[4] + "\n");
 				break;
 				case "like":
 //				assert_size([4,5], arg.length, "Invalid Number of Arguments");
