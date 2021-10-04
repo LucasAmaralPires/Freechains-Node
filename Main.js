@@ -35,8 +35,7 @@ Options:
     --help              [none]            displays this help
     --version           [none]            displays software version
     --host=<addr:port>  [all]             sets host address and port to connect [default: localhost:$PORT_8330]
-    --port=<port>       [all]             sets host port to connect [default: $PORT_8330] 
-										  should default not be used always use at the end
+    --port=<port>       [all]             sets host port to connect, always use at the end [default: $PORT_8330]
     --sign=<pvt>        [post|(dis)like]  signs post with given private key
     --encrypt           [post]            encrypts post with public key (only in public identity chains)
     --decrypt=<pvt>     [get]             decrypts post with private key (only in public identity chains)
