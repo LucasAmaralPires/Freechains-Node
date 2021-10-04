@@ -77,7 +77,7 @@ function main (argumentos)
 		{
 			console.log(VERSION);
 		}
-		if(argumentos[argumentos.length-1].substring(0,7) === "--port=");
+		if(argumentos[argumentos.length-1].substring(0,7) === "--port=")
 		{
 			port = parseInt(argumentos[argumentos.length-1].substring(7));
 			if(port < 1024 || port > 65535)
@@ -87,7 +87,6 @@ function main (argumentos)
 			}
 			argumentos.pop()
 		}		
-		
 		if(argumentos[0] === "freechains")
 		{
 			command_freechains(argumentos);
@@ -159,7 +158,7 @@ function command_freechains (arg)
 	{
 		case "crypto":
 			assert_size([4], arg.length, "Invalid Number of Arguments");
-			socket_connection(addr, PRE + " crypto shared\n" + arg[3] + "\n");
+			socket_connection(addr, PRE + " crypto " + arg[2] + "\n" + arg[3] + "\n");
 			break
 		case "peer":
 			assert_size([4,5], arg.length, "Invalid Number of Arguments");
