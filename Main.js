@@ -50,7 +50,6 @@ var port = 8330;
 /*
  * TODO:
  * Implementar conversa com host para 'chain' (heads, get, post, traverse, like and dislike)
- * Testar chain reps
  * Colocar as opções disponíveis (host, sign, encypto, decrypt e why)
  */
  
