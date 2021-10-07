@@ -34,7 +34,7 @@ Client:
 Options:
     --help              [none]            displays this help
     --version           [none]            displays software version
-    --host=<addr:port>  [all]             sets host address and port to connect [default: localhost:$PORT_8330]
+    --host=<addr:port>  [all]             sets host address and port to connect, always use at the end [default: localhost:$PORT_8330]
     --port=<port>       [all]             sets host port to connect, always use at the end [default: $PORT_8330]
     --sign=<pvt>        [post|(dis)like]  signs post with given private key
     --encrypt           [post]            encrypts post with public key (only in public identity chains)
@@ -46,11 +46,11 @@ More Information:
     Please report bugs at <http://github.com/Freechains/README/>.
 `
 var port = 8330;
-
+var addr = "localhost";
 /*
  * TODO:
  * Implementar conversa com host para 'chain' (heads, get, post, traverse, like and dislike)
- * Colocar as opções disponíveis (host, sign, encypto, decrypt e why)
+ * Colocar as opções disponíveis (sign, encypto, decrypt e why)
  */
 
 if(require.main === module)
@@ -64,7 +64,7 @@ function main (argumentos)
 	{
 		if(typeof input !== "string")
 		{
-			console.log("Command not recognized");
+			console.error("Command not recognized");
 			process.exit(1);
 		}
 	}
@@ -83,11 +83,23 @@ function main (argumentos)
 			port = parseInt(argumentos[argumentos.length-1].substring(7));
 			if(port < 1024 || port > 65535)
 			{
-				console.log("Invalid Port Number");
+				console.error("Invalid Port Number");
 				process.exit(1);
 			}
 			argumentos.pop()
-		}		
+		}
+		else if(argumentos[argumentos.length-1].substring(0,7) === "--host=")
+		{
+			let split = argumentos[argumentos.length-1].substring(7).split(":");
+			host = split[0];
+			port = parseInt(split[1]);
+			if(port < 1024 || port > 65535)
+			{
+				console.error("Invalid Port Number");
+				process.exit(1);
+			}
+			argumentos.pop()
+		}
 		if(argumentos[0] === "freechains")
 		{
 			command_freechains(argumentos);
@@ -99,12 +111,12 @@ function main (argumentos)
 	}
 	else
 	{
-		console.log("Command not recognized");
+		console.error("Command not recognized");
 		process.exit(1);
 	}
 }
 
-function socket_connection(addr, message, listen = false)
+function socket_connection(message, listen = false)
 {
 	const net = require('net');
 	const client = net.createConnection(port, addr);
@@ -128,7 +140,6 @@ function socket_connection(addr, message, listen = false)
 
 function command_freechains_host (arg)
 {
-	var addr = "localhost";
 	switch (arg[1])
 	{
 		case "start":
@@ -141,25 +152,24 @@ function command_freechains_host (arg)
 			break;
 		case "stop":
 			assert_size([2], arg.length, "Invalid Number of Arguments");
-			socket_connection(addr, PRE + " host stop\n");
+			socket_connection(PRE + " host stop\n");
 			break;
 		case "path":
 			assert_size([2], arg.length, "Invalid Number of Arguments");
-			socket_connection(addr, PRE + " host path\n");
+			socket_connection(PRE + " host path\n");
 			break;
 		default:
-			console.log("Command not recognized");
+			console.error("Command not recognized");
 	}
 }
 
 function command_freechains (arg)
 {
-	var addr = "localhost";
 	switch (arg[1])
 	{
 		case "crypto":
 			assert_size([4], arg.length, "Invalid Number of Arguments");
-			socket_connection(addr, PRE + " crypto " + arg[2] + "\n" + arg[3] + "\n");
+			socket_connection(PRE + " crypto " + arg[2] + "\n" + arg[3] + "\n");
 			break
 		case "peer":
 			assert_size([4,5], arg.length, "Invalid Number of Arguments");
@@ -168,22 +178,22 @@ function command_freechains (arg)
 			{
 				case "ping":
 				assert_size([4], arg.length, "Invalid Number of Arguments");
-				socket_connection(addr, PRE + " peer " + remote + " ping\n");
+				socket_connection(PRE + " peer " + remote + " ping\n");
 				break;
 				case "chains":
 				assert_size([4], arg.length, "Invalid Number of Arguments");
-				socket_connection(addr, PRE + " peer " + remote + " chains\n");
+				socket_connection(PRE + " peer " + remote + " chains\n");
 				break;
 				case "send":
 				assert_size([5], arg.length, "Invalid Number of Arguments");
-				socket_connection(addr, PRE + " peer " + remote + " send " + arg[4] + "\n");
+				socket_connection(PRE + " peer " + remote + " send " + arg[4] + "\n");
 				break;
 				case "recv":
 				assert_size([5], arg.length, "Invalid Number of Arguments");
-				socket_connection(addr, PRE + " peer " + remote + " recv " + arg[4] + "\n");
+				socket_connection(PRE + " peer " + remote + " recv " + arg[4] + "\n");
 				break;
 				default:
-					console.log("Command not recognized");
+					console.error("Command not recognized");
 			}
 			break
 		case "chains":
@@ -191,11 +201,11 @@ function command_freechains (arg)
 			{
 				case "list":
 				assert_size([3], arg.length, "Invalid Number of Arguments");
-				socket_connection(addr, PRE + " chains list\n");
+				socket_connection(PRE + " chains list\n");
 				break;
 				case "leave":
 				assert_size([4], arg.length, "Invalid Number of Arguments");
-				socket_connection(addr, PRE + " chains leave " + arg[3] + "\n");
+				socket_connection(PRE + " chains leave " + arg[3] + "\n");
 				break;
 				case "join":
 				if (arg.length >= 5) 
@@ -206,20 +216,20 @@ function command_freechains (arg)
 						comd += arg[i] + " ";
 					}
 					comd += arg[arg.length-1];
-					socket_connection(addr, comd + "\n");
+					socket_connection(comd + "\n");
 				}
 				else
 				{
 					assert_size([4], arg.length, "Invalid Number of Arguments");
-					socket_connection(addr, PRE + " chains join " + arg[3] + "\n");
+					socket_connection(PRE + " chains join " + arg[3] + "\n");
                 }
 				break;
 				case "listen":
 				assert_size([3], arg.length, "Invalid Number of Arguments");
-				socket_connection(addr, PRE + " chains listen\n", true);
+				socket_connection(PRE + " chains listen\n", true);
 				break;
 				default:
-					console.log("Command not recognized");
+					console.error("Command not recognized");
 			}
 			break
 		case "chain":
@@ -230,7 +240,7 @@ function command_freechains (arg)
 			{
 				case "genesis":
 				assert_size([4], arg.length, "Invalid Number of Arguments");
-				socket_connection(addr, PRE + " chain " + chain + " genesis\n");
+				socket_connection(PRE + " chain " + chain + " genesis\n");
 				break;
 				case "heads":
 //				assert_size([4,5], arg.length, "Invalid Number of Arguments");
@@ -250,7 +260,7 @@ function command_freechains (arg)
 				break;
 				case "reps":
 				assert_size([5], arg.length, "Invalid Number of Arguments");
-				socket_connection(addr, PRE + " chain " + chain + " reps " + arg[4] + "\n");
+				socket_connection(PRE + " chain " + chain + " reps " + arg[4] + "\n");
 				break;
 				case "like":
 //				assert_size([4,5], arg.length, "Invalid Number of Arguments");
@@ -262,14 +272,14 @@ function command_freechains (arg)
 				break;
 				case "listen":
 				assert_size([4], arg.length, "Invalid Number of Arguments");
-				socket_connection(addr, PRE + " chain " + chain + " listen\n", true);
+				socket_connection(PRE + " chain " + chain + " listen\n", true);
 				break;
 				default:
-					console.log("Command not recognized");
+					console.error("Command not recognized");
 			}			
 			break;
 		default:
-			console.log("Command not recognized");
+			console.error("Command not recognized");
 	}
 }
 
