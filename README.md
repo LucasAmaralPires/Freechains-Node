@@ -12,7 +12,7 @@ As an example you can retrive an encrypted shared key using freechains by typing
 nodejs Main.js freechains crypto shared teste
 ~~~
 
-The Main.js can also be used as an module in a javascript application. The next example demonstrates how to call the module Main.js from another program. 
+Main.js can also be used as an module in a javascript application. The next example demonstrates how to call the module Main.js from another program. 
 
 ~~~javascript
 const Main = require("./Main");
