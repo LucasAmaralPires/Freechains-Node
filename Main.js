@@ -52,8 +52,11 @@ var port = 8330;
  * Implementar conversa com host para 'chain' (heads, get, post, traverse, like and dislike)
  * Colocar as opções disponíveis (host, sign, encypto, decrypt e why)
  */
- 
-main(process.argv.slice(2))
+
+if(require.main === module)
+{
+	main(process.argv.slice(2))
+}
 
 function main (argumentos)
 {
