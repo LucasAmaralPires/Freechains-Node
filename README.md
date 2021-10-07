@@ -6,13 +6,13 @@ The file Main.js creates a client to use in conjunction with the Freechains serv
 nodejs Main.js "freechains command"
 ~~~
 
-As an example you can retrive a encrypted shared key using freechains by typing:
+As an example you can retrive an encrypted shared key using freechains by typing:
 
 ~~~shell
 nodejs Main.js freechains crypto shared teste
 ~~~
 
-The Mais.js can also be used as an module in a javascript application. The next example demonstrates how to call the module Main.js from another program. 
+The Main.js can also be used as an module in a javascript application. The next example demonstrates how to call the module Main.js from another program. 
 
 ~~~javascript
 const Main = require("./Main");
