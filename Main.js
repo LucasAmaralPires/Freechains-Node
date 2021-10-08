@@ -19,7 +19,7 @@ Client:
     
     freechains chain <name> genesis
     freechains chain <name> heads [blocked]
-    freechains chain <name> get (block | payload) <hash> [file <path>]
+    freechains chain <name> get (block | payload) <hash>
     freechains chain <name> post (inline | file) [<path_or_text>]
     freechains chain <name> (like | dislike) <hash>
     freechains chain <name> reps <hash_or_pub>
@@ -49,7 +49,7 @@ var port = 8330;
 var addr = "localhost";
 /*
  * TODO:
- * Implementar conversa com host para 'chain' (heads, get, post, traverse, like and dislike)
+ * Implementar conversa com host para 'chain' (get, post, traverse, like and dislike)
  * Colocar as opções disponíveis (sign(like), sign(dislike), encypto(post), decrypt(get), why(dislike) and why(like))
  */
 
