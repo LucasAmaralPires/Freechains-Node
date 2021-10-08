@@ -18,7 +18,7 @@ Client:
     freechains chains listen
     
     freechains chain <name> genesis
-    freechains chain <name> heads
+    freechains chain <name> heads [blocked]
     freechains chain <name> get (block | payload) <hash> [file <path>]
     freechains chain <name> post (inline | file) [<path_or_text>]
     freechains chain <name> (like | dislike) <hash>
@@ -242,8 +242,13 @@ function command_freechains (arg)
 					socket_connection(PRE + " chain " + chain + " genesis\n");
 					break;
 				case "heads":
-//				assert_size([4,5], arg.length, "Invalid Number of Arguments");
-				//codigo
+					let blocked = "";
+					assert_size([4,5], arg.length, "Invalid Number of Arguments");
+					if(arg[4] === "blocked")
+					{
+						blocked = " blocked";
+					}
+					socket_connection(PRE + " chain " + chain + " heads" + blocked + "\n");
 				break;
 				case "get":
 //				assert_size([4,5], arg.length, "Invalid Number of Arguments");
@@ -285,7 +290,6 @@ function command_freechains (arg)
 							console.error("Command not recognized");
 							process.exit(1);
 					}
-					console.log(pay);
 					socket_connection(PRE + " chain " + chain + " post " + sign + " false " + arg[5].length + "\n" + pay);
 					break;
 				case "traverse":
