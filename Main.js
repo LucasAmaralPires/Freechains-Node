@@ -19,7 +19,7 @@ Client:
     
     freechains chain <name> genesis
     freechains chain <name> heads [blocked]
-    freechains chain <name> get (block | payload) <hash>
+    freechains chain <name> get (block | payload) <hash> [file <path>]
     freechains chain <name> post (inline | file) [<path_or_text>]
     freechains chain <name> (like | dislike) <hash>
     freechains chain <name> reps <hash_or_pub>
