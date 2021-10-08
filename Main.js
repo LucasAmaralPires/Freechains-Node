@@ -50,6 +50,7 @@ var addr = "localhost";
 /*
  * TODO:
  * Implementar conversa com host para 'chain' (get, post, traverse, like and dislike)
+ * Ternminar/Consertar bugs do get
  * Colocar as opções disponíveis (sign(like), sign(dislike), encypto(post), decrypt(get), why(dislike) and why(like))
  */
 
@@ -116,7 +117,7 @@ function main (argumentos)
 	}
 }
 
-function socket_connection(message, listen = false)
+function socket_connection(message, listen = false, get = false)
 {
 	const net = require('net');
 	const client = net.createConnection(port, addr);
@@ -126,12 +127,17 @@ function socket_connection(message, listen = false)
 	client.on('data', (data) => 
 	{
 		buffer += data.toString();
-		if(buffer[buffer.length-1] === "\n")
+		if(buffer[buffer.length-1] === "\n" && get === false)
 		{
 			if(listen === false)
 			{
 				client.unref()
 			}
+			process.stdout.write(buffer);
+			buffer = "";
+		}
+		if(get === true)
+		{
 			process.stdout.write(buffer);
 			buffer = "";
 		}
@@ -251,9 +257,24 @@ function command_freechains (arg)
 					socket_connection(PRE + " chain " + chain + " heads" + blocked + "\n");
 				break;
 				case "get":
-//				assert_size([4,5], arg.length, "Invalid Number of Arguments");
-				//codigo
-				break;
+//				val decrypt = opts["--decrypt"].toString() // null or pvtkey
+					assert_size([6,8], arg.length, "Invalid Number of Arguments");
+					socket_connection(PRE + " chain " + chain + " get " + arg[4] + " " + arg[5] + " null\n", false, true);
+
+/*
+if (len.startsWith('!')) {
+	len
+} else {
+	val bs = reader.readNBytesX(len.toInt())
+	if (cmds.size == 5) {
+		bs.toString(Charsets.UTF_8)
+	} else {
+		assert(cmds[5] == "file")
+		File(cmds[6]).writeBytes(bs)
+		""
+	}
+}
+*/				break;
 				case "post":
 					let sign = "anon";
 					var pay;
