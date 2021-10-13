@@ -47,11 +47,14 @@ More Information:
 `
 var port = 8330;
 var addr = "localhost";
+var fs = require("fs");
+
 /*
  * TODO:
  * Implementar conversa com host para 'chain' (get, post, traverse, like and dislike)
  * Ternminar/Consertar bugs do get
  * Colocar as opções disponíveis (sign(like), sign(dislike), encypto(post), decrypt(get), why(dislike) and why(like))
+ * Atualizar/Simplificar o código
  */
 
 if(require.main === module)
@@ -117,30 +120,40 @@ function main (argumentos)
 	}
 }
 
-function socket_connection(message, listen = false, get = false)
+function socket_connection(message, listen = false, get = false, tofile = undefined)
 {
 	const net = require('net');
 	const client = net.createConnection(port, addr);
 	var buffer = "";
 	client.write(message);
 
+	if(get === true) 
+	{
+		client.setTimeout(2000);
+		if(tofile) var wfile = fs.createWriteStream(tofile, {flags: 'a'});
+		buffer = "Number of bytes: "
+	}
+
 	client.on('data', (data) => 
 	{
 		buffer += data.toString();
 		if(buffer[buffer.length-1] === "\n" && get === false)
 		{
-			if(listen === false)
-			{
-				client.unref()
-			}
+			if(listen === false) client.unref();
 			process.stdout.write(buffer);
 			buffer = "";
 		}
 		if(get === true)
 		{
-			process.stdout.write(buffer);
+			if(tofile === undefined) process.stdout.write(buffer);
+			else if(typeof tofile === 'string') wfile.write(buffer);
 			buffer = "";
 		}
+	});
+	
+	client.on('timeout', () => {
+		if(tofile === undefined) process.stdout.write("\n");
+		client.unref()
 	});
 }
 
@@ -239,7 +252,6 @@ function command_freechains (arg)
 			}
 			break
 		case "chain":
-			fs = require("fs");
 			var chain = arg[2];
 			switch(arg[3])
 			{
@@ -250,31 +262,18 @@ function command_freechains (arg)
 				case "heads":
 					let blocked = "";
 					assert_size([4,5], arg.length, "Invalid Number of Arguments");
-					if(arg[4] === "blocked")
-					{
-						blocked = " blocked";
-					}
-					socket_connection(PRE + " chain " + chain + " heads" + blocked + "\n");
+					if(arg[4] === "blocked") blocked = " blocked";
+					socket_connection(`${PRE} chain ${chain} heads${blocked}\n`);
+//					socket_connection(PRE + " chain " + chain + " heads" + blocked + "\n");
 				break;
 				case "get":
 //				val decrypt = opts["--decrypt"].toString() // null or pvtkey
+					let path = undefined;
 					assert_size([6,8], arg.length, "Invalid Number of Arguments");
-					socket_connection(PRE + " chain " + chain + " get " + arg[4] + " " + arg[5] + " null\n", false, true);
-
-/*
-if (len.startsWith('!')) {
-	len
-} else {
-	val bs = reader.readNBytesX(len.toInt())
-	if (cmds.size == 5) {
-		bs.toString(Charsets.UTF_8)
-	} else {
-		assert(cmds[5] == "file")
-		File(cmds[6]).writeBytes(bs)
-		""
-	}
-}
-*/				break;
+					if (arg[6] === "file") path = arg[7];
+					socket_connection(`${PRE} chain ${chain} get ${arg[4]} ${arg[5]} null\n`, undefined, true, path);
+//					socket_connection(PRE + " chain " + chain + " get " + arg[4] + " " + arg[5] + " null\n", undefined, true);
+				break;
 				case "post":
 					let sign = "anon";
 					var pay;
@@ -311,7 +310,7 @@ if (len.startsWith('!')) {
 							console.error("Command not recognized");
 							process.exit(1);
 					}
-					socket_connection(PRE + " chain " + chain + " post " + sign + " false " + arg[5].length + "\n" + pay);
+					socket_connection(`${PRE} chain ${chain} post ${sign} false ${pay.length}\n${pay}`);
 					break;
 				case "traverse":
 //				assert_size([4,5], arg.length, "Invalid Number of Arguments");
