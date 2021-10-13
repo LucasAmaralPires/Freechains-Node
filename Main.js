@@ -52,9 +52,10 @@ var fs = require("fs");
 /*
  * TODO:
  * Implementar conversa com host para 'chain' (get, post, traverse, like and dislike)
- * Ternminar/Consertar bugs do get
  * Colocar as opções disponíveis (sign(like), sign(dislike), encypto(post), decrypt(get), why(dislike) and why(like))
  * Atualizar/Simplificar o código
+ * Descobrir porque so consigo chamar 1 vez uma funçao em um modulo
+ * Permitir utilizar host nao padrao em freechains-host host start
  */
 
 if(require.main === module)
@@ -64,7 +65,7 @@ if(require.main === module)
 
 function main (argumentos)
 {
-	for (input of argumentos)
+ 	for (input of argumentos)
 	{
 		if(typeof input !== "string")
 		{
@@ -77,10 +78,12 @@ function main (argumentos)
 		if(argumentos[1] === "--help")
 		{
 			console.log(HELP);
+			process.exit(1);
 		}
 		else if(argumentos[1] === "--version")
 		{
 			console.log(VERSION);
+			process.exit(1);
 		}
 		if(argumentos[argumentos.length-1].substring(0,7) === "--port=")
 		{
@@ -104,14 +107,8 @@ function main (argumentos)
 			}
 			argumentos.pop()
 		}
-		if(argumentos[0] === "freechains")
-		{
-			command_freechains(argumentos);
-		}
-		else
-		{
-			command_freechains_host(argumentos);
-		}
+		if(argumentos[0] === "freechains") command_freechains(argumentos);
+		else command_freechains_host(argumentos);
 	}
 	else
 	{
@@ -164,18 +161,18 @@ function command_freechains_host (arg)
 		case "start":
 			assert_size([2,3], arg.length, "Invalid Number of Arguments");
 			const { exec } = require("child_process");
-			exec("freechains-host start " + arg[2] + " --port=" + port + " &", (stdout) => {
+			exec(`freechains-host start ${arg[2]} --port=${port} &`, (stdout) => {
 				console.log(stdout);
 			});
 			process.exit(1);
 			break;
 		case "stop":
 			assert_size([2], arg.length, "Invalid Number of Arguments");
-			socket_connection(PRE + " host stop\n");
+			socket_connection(`${PRE} host stop\n`);
 			break;
 		case "path":
 			assert_size([2], arg.length, "Invalid Number of Arguments");
-			socket_connection(PRE + " host path\n");
+			socket_connection(`${PRE} host path\n`);
 			break;
 		default:
 			console.error("Command not recognized");
@@ -188,7 +185,7 @@ function command_freechains (arg)
 	{
 		case "crypto":
 			assert_size([4], arg.length, "Invalid Number of Arguments");
-			socket_connection(PRE + " crypto " + arg[2] + "\n" + arg[3] + "\n");
+			socket_connection(`${PRE} crypto ${arg[2]}\n${arg[3]}\n`);
 			break
 		case "peer":
 			assert_size([4,5], arg.length, "Invalid Number of Arguments");
@@ -264,7 +261,6 @@ function command_freechains (arg)
 					assert_size([4,5], arg.length, "Invalid Number of Arguments");
 					if(arg[4] === "blocked") blocked = " blocked";
 					socket_connection(`${PRE} chain ${chain} heads${blocked}\n`);
-//					socket_connection(PRE + " chain " + chain + " heads" + blocked + "\n");
 				break;
 				case "get":
 //				val decrypt = opts["--decrypt"].toString() // null or pvtkey
@@ -272,7 +268,6 @@ function command_freechains (arg)
 					assert_size([6,8], arg.length, "Invalid Number of Arguments");
 					if (arg[6] === "file") path = arg[7];
 					socket_connection(`${PRE} chain ${chain} get ${arg[4]} ${arg[5]} null\n`, undefined, true, path);
-//					socket_connection(PRE + " chain " + chain + " get " + arg[4] + " " + arg[5] + " null\n", undefined, true);
 				break;
 				case "post":
 					let sign = "anon";
