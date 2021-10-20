@@ -53,47 +53,32 @@ var fs = require("fs");
 
 /*
  * TODO:
- * Atualizar/Simplificar o código
- * Descobrir porque so consigo chamar 1 vez uma funçao em um modulo (Por causa do process.exit(), pesquisar alternativa)
  * Permitir utilizar host nao padrao em freechains-host host start
+ * Não travar o programa no freechains-host start
+ * Resolver o problema da sincronia
  * Perguntar para o professor sobre o traverse
  */
 
 if(require.main === module)
 {
-	main(process.argv.slice(2))
+	main(process.argv.slice(2));
 }
 
 function main (argumentos)
 {
  	for (input of argumentos)
 	{
-		if(typeof input !== "string")
-		{
-			console.error(ERROR[1]);
-			process.exit(1);
-		}
+		if(typeof input !== "string") console.error(ERROR[1]);
+		return;
 	}
 	if(argumentos[0] === "freechains" || argumentos[0] === "freechains-host")
 	{
-		if(argumentos[1] === "--help")
-		{
-			console.log(HELP);
-			process.exit(1);
-		}
-		else if(argumentos[1] === "--version")
-		{
-			console.log(VERSION);
-			process.exit(1);
-		}
+		if(argumentos[1] === "--help") console.log(HELP);
+		else if(argumentos[1] === "--version") console.log(VERSION);
 		if(argumentos[argumentos.length-1].substring(0,7) === "--port=")
 		{
 			port = parseInt(argumentos[argumentos.length-1].substring(7));
-			if(port < 1024 || port > 65535)
-			{
-				console.error(ERROR[3]);
-				process.exit(1);
-			}
+			if(port < 1024 || port > 65535) console.error(ERROR[3]);
 			argumentos.pop()
 		}
 		else if(argumentos[argumentos.length-1].substring(0,7) === "--host=")
@@ -101,21 +86,13 @@ function main (argumentos)
 			let split = argumentos[argumentos.length-1].substring(7).split(":");
 			host = split[0];
 			port = parseInt(split[1]);
-			if(port < 1024 || port > 65535)
-			{
-				console.error(ERROR[3]);
-				process.exit(1);
-			}
+			if(port < 1024 || port > 65535) console.error(ERROR[3]);
 			argumentos.pop()
 		}
 		if(argumentos[0] === "freechains") command_freechains(argumentos);
 		else command_freechains_host(argumentos);
 	}
-	else
-	{
-		console.error(ERROR[1]);
-		process.exit(1);
-	}
+	else console.error(ERROR[1]);
 }
 
 function socket_connection(message, listen = false, get = false, tofile = undefined)
@@ -125,9 +102,9 @@ function socket_connection(message, listen = false, get = false, tofile = undefi
 	var buffer = "";
 	client.write(message);
 
+	if(listen === false) client.setTimeout(1000);
 	if(get === true) 
 	{
-		client.setTimeout(2000);
 		if(tofile) var wfile = fs.createWriteStream(tofile, {flags: 'a'});
 		buffer = "Number of bytes: "
 	}
@@ -135,22 +112,16 @@ function socket_connection(message, listen = false, get = false, tofile = undefi
 	client.on('data', (data) => 
 	{
 		buffer += data.toString();
-		if(buffer[buffer.length-1] === "\n" && get === false)
+		if (listen === true)
 		{
-			if(listen === false) client.unref();
 			process.stdout.write(buffer);
-			buffer = "";
-		}
-		if(get === true)
-		{
-			if(tofile === undefined) process.stdout.write(buffer);
-			else if(typeof tofile === 'string') wfile.write(buffer);
 			buffer = "";
 		}
 	});
 	
 	client.on('timeout', () => {
-		if(tofile === undefined) process.stdout.write("\n");
+		process.stdout.write(buffer);
+		if(typeof tofile === 'string') wfile.write(buffer);
 		client.unref()
 	});
 }
@@ -160,19 +131,16 @@ function command_freechains_host (arg)
 	switch (arg[1])
 	{
 		case "start":
-			assert_size([2,3], arg.length, ERROR[2]);
+			if(assert_size([2,3], arg.length, ERROR[2])) return;
 			const { exec } = require("child_process");
-			exec(`freechains-host start ${arg[2]} --port=${port} &`, (stdout) => {
-				console.log(stdout);
-			});
-			process.exit(1);
-			break;
+			exec(`freechains-host start ${arg[2]} --port=${port} &`);
+			return;
 		case "stop":
-			assert_size([2], arg.length, ERROR[2]);
+			if(assert_size([2], arg.length, ERROR[2])) return;
 			socket_connection(`${PRE} host stop\n`);
 			break;
 		case "path":
-			assert_size([2], arg.length, ERROR[2]);
+			if(assert_size([2], arg.length, ERROR[2])) return;
 			socket_connection(`${PRE} host path\n`);
 			break;
 		default:
@@ -185,28 +153,28 @@ function command_freechains (arg)
 	switch (arg[1])
 	{
 		case "crypto":
-			assert_size([4], arg.length, ERROR[2]);
+			if(assert_size([4], arg.length, ERROR[2])) return;
 			socket_connection(`${PRE} crypto ${arg[2]}\n${arg[3]}\n`);
-			break
+			break;
 		case "peer":
-			assert_size([4,5], arg.length, ERROR[2]);
+			if(assert_size([4,5], arg.length, ERROR[2])) return;
 			var remote = arg[2];
 			switch(arg[3])
 			{
 				case "ping":
-					assert_size([4], arg.length, ERROR[2]);
+					if(assert_size([4], arg.length, ERROR[2])) return;
 					socket_connection(`${PRE} peer ${remote} ping\n`);
 					break;
 				case "chains":
-					assert_size([4], arg.length, ERROR[2]);
+					if(assert_size([4], arg.length, ERROR[2])) return;
 					socket_connection(`${PRE} peer ${remote} chains\n`);
 					break;
 				case "send":
-					assert_size([5], arg.length, ERROR[2]);
+					if(assert_size([5], arg.length, ERROR[2])) return;
 					socket_connection(`${PRE} peer ${remote} send ${arg[4]}\n`);
 					break;
 				case "recv":
-					assert_size([5], arg.length, ERROR[2]);
+					if(assert_size([5], arg.length, ERROR[2])) return;
 					socket_connection(`${PRE} peer ${remote} recv ${arg[4]}\n`);
 					break;
 				default:
@@ -217,11 +185,11 @@ function command_freechains (arg)
 			switch(arg[2])
 			{
 				case "list":
-					assert_size([3], arg.length, ERROR[2]);
+					if(assert_size([3], arg.length, ERROR[2])) return;
 					socket_connection(PRE + " chains list\n");
 					break;
 				case "leave":
-					assert_size([4], arg.length, ERROR[2]);
+					if(assert_size([4], arg.length, ERROR[2])) return;
 					socket_connection(PRE + " chains leave " + arg[3] + "\n");
 					break;
 				case "join":
@@ -237,12 +205,12 @@ function command_freechains (arg)
 					}
 					else
 					{
-						assert_size([4], arg.length, ERROR[2]);
+						if(assert_size([4], arg.length, ERROR[2])) return;
 						socket_connection(PRE + " chains join " + arg[3] + "\n");
 					}
 					break;
 				case "listen":
-					assert_size([3], arg.length, ERROR[2]);
+					if(assert_size([3], arg.length, ERROR[2])) return;
 					socket_connection(PRE + " chains listen\n", true);
 					break;
 				default:
@@ -254,19 +222,19 @@ function command_freechains (arg)
 			switch(arg[3])
 			{
 				case "genesis":
-					assert_size([4], arg.length, ERROR[2]);
+					if(assert_size([4], arg.length, ERROR[2])) return;
 					socket_connection(PRE + " chain " + chain + " genesis\n");
 					break;
 				case "heads":
 					let blocked = "";
-					assert_size([4,5], arg.length, ERROR[2]);
+					if(assert_size([4,5], arg.length, ERROR[2])) return;
 					if(arg[4] === "blocked") blocked = " blocked";
 					socket_connection(`${PRE} chain ${chain} heads${blocked}\n`);
 				break;
 				case "get":
 					let decrypt = null;
 					let path = undefined;
-					assert_size([6,7,8,9], arg.length, ERROR[2]);
+					if(assert_size([6,7,8,9], arg.length, ERROR[2])) return;
 					if (arg[6] === "file") path = arg[7];
 					else if (arg[6] && arg[6].substring(0,10) === "--decrypt=") decrypt = arg[6].substring(10);
 					if (arg[8] && arg[8].substring(0,10) === "--decrypt=") decrypt = arg[8].substring(10);
@@ -276,7 +244,7 @@ function command_freechains (arg)
 					let sign = "anon";
 					let encrypt = false;
 					var pay;
-					assert_size([6,7,8], arg.length, ERROR[2]);
+					if(assert_size([6,7,8], arg.length, ERROR[2])) return;
 					for(input of arg)
 					{
 						if(input.substring(0,7) === "--sign=") sign = input.substring(7);
@@ -295,12 +263,12 @@ function command_freechains (arg)
 							catch(error) 
 							{
 								console.error(ERROR[4]);
-								process.exit(1);
+								return;
 							}
 							break;
 						default:
 							console.error(ERROR[1]);
-							process.exit(1);
+							return;
 					}
 					socket_connection(`${PRE} chain ${chain} post ${sign} ${encrypt} ${pay.length}\n${pay}`);
 					break;
@@ -313,7 +281,7 @@ function command_freechains (arg)
 					socket_connection(`${PRE} chain ${chain} traverse ${traverse}\n`);					
 					break;
 				case "reps":
-					assert_size([5], arg.length, ERROR[2]);
+					if(assert_size([5], arg.length, ERROR[2])) return;
 					socket_connection(PRE + " chain " + chain + " reps " + arg[4] + "\n");
 					break;
 				case "like":
@@ -329,12 +297,12 @@ function command_freechains (arg)
 					if(!sign_ld) 
 					{
 						console.log(ERROR[5]);
-						process.exit(1);
+						return;
 					}
 					socket_connection(`${PRE} chain ${chain} like ${like} ${arg[4]} ${sign_ld} ${why.length}\n${why}\n`)
 					break;
 				case "listen":
-					assert_size([4], arg.length, ERROR[2]);
+					if(assert_size([4], arg.length, ERROR[2])) return;
 					socket_connection(PRE + " chain " + chain + " listen\n", true);
 					break;
 				default:
@@ -348,11 +316,13 @@ function command_freechains (arg)
 
 function assert_size (nums, for_test, err_msg)
 {
+	let er = false;
 	if(!nums.includes(for_test)) 
 	{
 		console.error(err_msg);
-		process.exit(1);  
+		er = true;
 	}
+	return er;
 }
 
 module.exports = { main };
