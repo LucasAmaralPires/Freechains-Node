@@ -1,6 +1,6 @@
 const MAJOR    = "0";
-const MINOR    = "8";
-const REVISION = "6";
+const MINOR    = "10";
+const REVISION = "0";
 const VERSION  = "v" + MAJOR + "." + MINOR + "." + REVISION;
 const PRE      = "FC " + VERSION;
 const ERROR	   = ["Sucess", "Command not recognized", "Invalid Number of Arguments", "Invalid Port Number", "Unable to Read File", "Need private key"];
@@ -11,40 +11,49 @@ Host:
     freechains-host start <dir>
     freechains-host stop
     freechains-host path
+    freechains-host now <time>
+    
+	Options:
+		--help          displays this help
+		--version       displays software version
+		--port=<port>   sets port to connect [default: 8330]
     
 Client:
-    freechains chains join  <chain> [<key>...]
-    freechains chains leave <chain>
-    freechains chains list
-    freechains chains listen
-    
-    freechains chain <name> genesis
-    freechains chain <name> heads [blocked]
-    freechains chain <name> get (block | payload) <hash> [file <path>]
-    freechains chain <name> post (inline | file) [<path_or_text>]
-    freechains chain <name> (like | dislike) <hash>
-    freechains chain <name> reps <hash_or_pub>
-    freechains chain <name> traverse <hashes>...
-    freechains chain <name> listen
-    
-    freechains peer <addr:port> ping
-    freechains peer <addr:port> chains
-    freechains peer <addr:port> (send | recv) <chain>
-    freechains crypto (shared | pubpvt) <passphrase>
-    
-Options:
-    --help              [none]            displays this help
-    --version           [none]            displays software version
-    --host=<addr:port>  [all]             sets host address and port to connect, always use at the end [default: localhost:$PORT_8330]
-    --port=<port>       [all]             sets host port to connect, always use at the end [default: $PORT_8330]
-    --sign=<pvt>        [post|(dis)like]  signs post with given private key
-    --encrypt           [post]            encrypts post with public key (only in public identity chains)
-    --decrypt=<pvt>     [get]             decrypts post with private key, at the end but before host/port (only in public identity chains)
-    --why=<text>        [(dis)like]       explains reason for the like
+	freechains chains join  <chain> [<key>...]
+	freechains chains leave <chain>
+	freechains chains list
+	freechains chains listen
+	
+	freechains chain <name> genesis
+	freechains chain <name> heads [blocked]
+	freechains chain <name> get (block | payload) <hash> [file <path>]
+	freechains chain <name> post (inline | file | -) [<path_or_text>]
+	freechains chain <name> (like | dislike) <hash>
+	freechains chain <name> reps <hash_or_pub>
+	freechains chain <name> consensus
+	freechains chain <name> listen
+	
+	freechains peer <addr:port> ping
+	freechains peer <addr:port> chains
+	freechains peer <addr:port> (send | recv) <chain>
 
-More Information:
-    http://www.freechains.org/
-    Please report bugs at <http://github.com/Freechains/README/>.
+	freechains keys (shared | pubpvt) <passphrase>
+	
+	Options:
+		--help              [none]            displays this help
+		--version           [none]            displays software version
+		--host=<addr:port>  [all]             sets host address and port to connect [default: localhost:8330]
+		--port=<port>       [all]             sets host port to connect [default: 8330]
+		--sign=<pvt>        [post|(dis)like]  signs post with given private key
+		--encrypt           [post]            encrypts post with public key (only in public identity chains)
+		--decrypt=<pvt>     [get]             decrypts post with private key (only in public identity chains)
+		--why=<text>        [(dis)like]       explains reason for the like
+	
+	More Information:
+	
+		http://www.freechains.org/
+	
+		Please report bugs at <http://github.com/Freechains/README/>.	
 `
 var port = 8330;
 var addr = "localhost";
@@ -56,7 +65,7 @@ var fs = require("fs");
  * Permitir utilizar host nao padrao em freechains-host host start
  * Não travar o programa no freechains-host start
  * Resolver o problema da sincronia
- * Perguntar para o professor sobre o traverse
+ * Erro quando o host não estiver funcionando
  */
 
 if(require.main === module)
@@ -68,13 +77,24 @@ function main (argumentos)
 {
  	for (input of argumentos)
 	{
-		if(typeof input !== "string") console.error(ERROR[1]);
-		return;
+		if(typeof input !== "string") 
+		{
+			console.error(ERROR[1]);
+			return;
+		}
 	}
 	if(argumentos[0] === "freechains" || argumentos[0] === "freechains-host")
 	{
-		if(argumentos[1] === "--help") console.log(HELP);
-		else if(argumentos[1] === "--version") console.log(VERSION);
+		if(argumentos[1] === "--help") 
+		{
+			console.log(HELP);
+			return;
+		}
+		else if(argumentos[1] === "--version")
+		{
+			console.log(VERSION);
+			return;
+		}
 		if(argumentos[argumentos.length-1].substring(0,7) === "--port=")
 		{
 			port = parseInt(argumentos[argumentos.length-1].substring(7));
@@ -122,7 +142,7 @@ function socket_connection(message, listen = false, get = false, tofile = undefi
 	client.on('timeout', () => {
 		process.stdout.write(buffer);
 		if(typeof tofile === 'string') wfile.write(buffer);
-		client.unref()
+		client.unref();
 	});
 }
 
@@ -143,6 +163,12 @@ function command_freechains_host (arg)
 			if(assert_size([2], arg.length, ERROR[2])) return;
 			socket_connection(`${PRE} host path\n`);
 			break;
+		case "now":
+			if(assert_size([2,3], arg.length, ERROR[2])) return;
+			message_host = `${PRE} host now`;
+			if(arg[2] != undefined) message_host += ` ${arg[2]}`
+			socket_connection(message_host + `\n`);
+			break;
 		default:
 			console.error(ERROR[1]);
 	}
@@ -152,9 +178,9 @@ function command_freechains (arg)
 {
 	switch (arg[1])
 	{
-		case "crypto":
+		case "keys":
 			if(assert_size([4], arg.length, ERROR[2])) return;
-			socket_connection(`${PRE} crypto ${arg[2]}\n${arg[3]}\n`);
+			socket_connection(`${PRE} keys ${arg[2]}\n${arg[3]}\n`);
 			break;
 		case "peer":
 			if(assert_size([4,5], arg.length, ERROR[2])) return;
