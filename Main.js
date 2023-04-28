@@ -115,7 +115,7 @@ function main (argumentos, callback)
 	else console.error(ERROR[1]);
 }
 
-function socket_connection(message,	callback, listen = false, get = false, tofile = undefined)
+function socket_connection(message,callback, listen = false, get = false, tofile = undefined)
 {
 	const net = require('net');
 	const client = net.createConnection(port, addr);
@@ -134,6 +134,7 @@ function socket_connection(message,	callback, listen = false, get = false, tofil
 		buffer += data.toString();
 		if (listen === true)
 		{
+			callback(buffer);
 			buffer = "";
 		}
 	});
