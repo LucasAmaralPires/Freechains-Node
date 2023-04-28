@@ -64,16 +64,16 @@ var fs = require("fs");
  * TODO:
  * Permitir utilizar host nao padrao em freechains-host host start
  * Não travar o programa no freechains-host start
- * Resolver o problema da sincronia
  * Erro quando o host não estiver funcionando
+ * Revisar freechains-host start, freechains peer, freechains chains e freechains chain
  */
 
 if(require.main === module)
 {
-	main(process.argv.slice(2));
+	main(process.argv.slice(2),(ans) => {console.log(ans)});
 }
 
-function main (argumentos)
+function main (argumentos, callback)
 {
  	for (input of argumentos)
 	{
@@ -109,20 +109,20 @@ function main (argumentos)
 			if(port < 1024 || port > 65535) console.error(ERROR[3]);
 			argumentos.pop()
 		}
-		if(argumentos[0] === "freechains") command_freechains(argumentos);
-		else command_freechains_host(argumentos);
+		if(argumentos[0] === "freechains") command_freechains(argumentos,callback);
+		else command_freechains_host(argumentos,callback);
 	}
 	else console.error(ERROR[1]);
 }
 
-function socket_connection(message, listen = false, get = false, tofile = undefined)
+function socket_connection(message,	callback, listen = false, get = false, tofile = undefined)
 {
 	const net = require('net');
 	const client = net.createConnection(port, addr);
 	var buffer = "";
 	client.write(message);
 
-	if(listen === false) client.setTimeout(1000);
+//	if(listen === false) client.setTimeout(1000);
 	if(get === true) 
 	{
 		if(tofile) var wfile = fs.createWriteStream(tofile, {flags: 'a'});
@@ -134,19 +134,25 @@ function socket_connection(message, listen = false, get = false, tofile = undefi
 		buffer += data.toString();
 		if (listen === true)
 		{
-			process.stdout.write(buffer);
 			buffer = "";
 		}
 	});
-	
+
+	client.on('end', () => {
+		callback(buffer);
+	//		process.stdout.write(buffer);		
+		if(typeof tofile === 'string') wfile.write(buffer);
+		client.end();
+	})
+	/*
 	client.on('timeout', () => {
 		process.stdout.write(buffer);
 		if(typeof tofile === 'string') wfile.write(buffer);
 		client.unref();
-	});
+	});*/
 }
 
-function command_freechains_host (arg)
+function command_freechains_host (arg,callback)
 {
 	switch (arg[1])
 	{
@@ -157,30 +163,30 @@ function command_freechains_host (arg)
 			return;
 		case "stop":
 			if(assert_size([2], arg.length, ERROR[2])) return;
-			socket_connection(`${PRE} host stop\n`);
+			socket_connection(`${PRE} host stop\n`, callback);
 			break;
 		case "path":
 			if(assert_size([2], arg.length, ERROR[2])) return;
-			socket_connection(`${PRE} host path\n`);
+			socket_connection(`${PRE} host path\n`, callback);
 			break;
 		case "now":
 			if(assert_size([2,3], arg.length, ERROR[2])) return;
 			message_host = `${PRE} host now`;
 			if(arg[2] != undefined) message_host += ` ${arg[2]}`
-			socket_connection(message_host + `\n`);
+			socket_connection(message_host + `\n`, callback);
 			break;
 		default:
 			console.error(ERROR[1]);
 	}
 }
 
-function command_freechains (arg)
+function command_freechains (arg, callback)
 {
 	switch (arg[1])
 	{
 		case "keys":
 			if(assert_size([4], arg.length, ERROR[2])) return;
-			socket_connection(`${PRE} keys ${arg[2]}\n${arg[3]}\n`);
+			socket_connection(`${PRE} keys ${arg[2]}\n${arg[3]}\n`,callback);
 			break;
 		case "peer":
 			if(assert_size([4,5], arg.length, ERROR[2])) return;
@@ -189,34 +195,34 @@ function command_freechains (arg)
 			{
 				case "ping":
 					if(assert_size([4], arg.length, ERROR[2])) return;
-					socket_connection(`${PRE} peer ${remote} ping\n`);
+					socket_connection(`${PRE} peer ${remote} ping\n`, callback);
 					break;
 				case "chains":
 					if(assert_size([4], arg.length, ERROR[2])) return;
-					socket_connection(`${PRE} peer ${remote} chains\n`);
+					socket_connection(`${PRE} peer ${remote} chains\n`, callback);
 					break;
 				case "send":
 					if(assert_size([5], arg.length, ERROR[2])) return;
-					socket_connection(`${PRE} peer ${remote} send ${arg[4]}\n`);
+					socket_connection(`${PRE} peer ${remote} send ${arg[4]}\n`, callback);
 					break;
 				case "recv":
 					if(assert_size([5], arg.length, ERROR[2])) return;
-					socket_connection(`${PRE} peer ${remote} recv ${arg[4]}\n`);
+					socket_connection(`${PRE} peer ${remote} recv ${arg[4]}\n`, callback);
 					break;
 				default:
 					console.error(ERROR[1]);
 			}
-			break
+			break;
 		case "chains":
 			switch(arg[2])
 			{
 				case "list":
 					if(assert_size([3], arg.length, ERROR[2])) return;
-					socket_connection(PRE + " chains list\n");
+					socket_connection(PRE + " chains list\n", callback);
 					break;
 				case "leave":
 					if(assert_size([4], arg.length, ERROR[2])) return;
-					socket_connection(PRE + " chains leave " + arg[3] + "\n");
+					socket_connection(PRE + " chains leave " + arg[3] + "\n", callback);
 					break;
 				case "join":
 					if (arg.length >= 5) 
@@ -227,17 +233,17 @@ function command_freechains (arg)
 							comd += arg[i] + " ";
 						}
 						comd += arg[arg.length-1];
-						socket_connection(comd + "\n");
+						socket_connection(comd + "\n", callback);
 					}
 					else
 					{
 						if(assert_size([4], arg.length, ERROR[2])) return;
-						socket_connection(PRE + " chains join " + arg[3] + "\n");
+						socket_connection(PRE + " chains join " + arg[3] + "\n", callback);
 					}
 					break;
 				case "listen":
 					if(assert_size([3], arg.length, ERROR[2])) return;
-					socket_connection(PRE + " chains listen\n", true);
+					socket_connection(PRE + " chains listen\n", callback, true);
 					break;
 				default:
 					console.error(ERROR[1]);
@@ -249,13 +255,13 @@ function command_freechains (arg)
 			{
 				case "genesis":
 					if(assert_size([4], arg.length, ERROR[2])) return;
-					socket_connection(PRE + " chain " + chain + " genesis\n");
+					socket_connection(PRE + " chain " + chain + " genesis\n", callback);
 					break;
 				case "heads":
 					let blocked = "";
 					if(assert_size([4,5], arg.length, ERROR[2])) return;
 					if(arg[4] === "blocked") blocked = " blocked";
-					socket_connection(`${PRE} chain ${chain} heads${blocked}\n`);
+					socket_connection(`${PRE} chain ${chain} heads${blocked}\n`, callback);
 				break;
 				case "get":
 					let decrypt = null;
@@ -264,7 +270,7 @@ function command_freechains (arg)
 					if (arg[6] === "file") path = arg[7];
 					else if (arg[6] && arg[6].substring(0,10) === "--decrypt=") decrypt = arg[6].substring(10);
 					if (arg[8] && arg[8].substring(0,10) === "--decrypt=") decrypt = arg[8].substring(10);
-					socket_connection(`${PRE} chain ${chain} get ${arg[4]} ${arg[5]} ${decrypt}\n`, undefined, true, path);
+					socket_connection(`${PRE} chain ${chain} get ${arg[4]} ${arg[5]} ${decrypt}\n`, callback, undefined, true, path);
 				break;
 				case "post":
 					let sign = "anon";
@@ -296,7 +302,7 @@ function command_freechains (arg)
 							console.error(ERROR[1]);
 							return;
 					}
-					socket_connection(`${PRE} chain ${chain} post ${sign} ${encrypt} ${pay.length}\n${pay}`);
+					socket_connection(`${PRE} chain ${chain} post ${sign} ${encrypt} ${pay.length}\n${pay}`, callback);
 					break;
 				case "traverse":
 					let traverse = ""
@@ -304,11 +310,11 @@ function command_freechains (arg)
 					{
 						traverse += arg[i] + " ";
 					}
-					socket_connection(`${PRE} chain ${chain} traverse ${traverse}\n`);					
+					socket_connection(`${PRE} chain ${chain} traverse ${traverse}\n`, callback);					
 					break;
 				case "reps":
 					if(assert_size([5], arg.length, ERROR[2])) return;
-					socket_connection(PRE + " chain " + chain + " reps " + arg[4] + "\n");
+					socket_connection(PRE + " chain " + chain + " reps " + arg[4] + "\n", callback);
 					break;
 				case "like":
 				case "dislike":
@@ -325,11 +331,11 @@ function command_freechains (arg)
 						console.log(ERROR[5]);
 						return;
 					}
-					socket_connection(`${PRE} chain ${chain} like ${like} ${arg[4]} ${sign_ld} ${why.length}\n${why}\n`)
+					socket_connection(`${PRE} chain ${chain} like ${like} ${arg[4]} ${sign_ld} ${why.length}\n${why}\n`, callback)
 					break;
 				case "listen":
 					if(assert_size([4], arg.length, ERROR[2])) return;
-					socket_connection(PRE + " chain " + chain + " listen\n", true);
+					socket_connection(PRE + " chain " + chain + " listen\n", callback, true);
 					break;
 				default:
 					console.error(ERROR[1]);
