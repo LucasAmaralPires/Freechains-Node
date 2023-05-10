@@ -63,9 +63,7 @@ var fs = require("fs");
 /*
  * TODO:
  * Permitir utilizar host nao padrao em freechains-host host start
- * Não travar o programa no freechains-host start
  * Erro quando o host não estiver funcionando
- * Revisar freechains-host start, freechains peer, freechains chains e freechains chain
  */
 
 if(require.main === module)
@@ -115,7 +113,7 @@ function main (argumentos, callback)
 	else console.error(ERROR[1]);
 }
 
-function socket_connection(message,callback, listen = false, get = false, tofile = undefined)
+function socket_connection(message,	callback, listen = false, get = false, tofile = undefined)
 {
 	const net = require('net');
 	const client = net.createConnection(port, addr);
@@ -161,7 +159,7 @@ function command_freechains_host (arg,callback)
 			if(assert_size([2,3], arg.length, ERROR[2])) return;
 			const { exec } = require("child_process");
 			exec(`freechains-host start ${arg[2]} --port=${port} &`);
-			return;
+			process.exit();
 		case "stop":
 			if(assert_size([2], arg.length, ERROR[2])) return;
 			socket_connection(`${PRE} host stop\n`, callback);
