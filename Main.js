@@ -157,9 +157,9 @@ function command_freechains_host (arg,callback)
 	{
 		case "start":
 			if(assert_size([2,3], arg.length, ERROR[2])) return;
-			const { exec } = require("child_process");
-			exec(`freechains-host start ${arg[2]} --port=${port} &`);
-			process.exit();
+			const { spawn } = require("child_process");
+			spawn("freechains-host", ["start", `${arg[2]}`, `--port=${port}`])
+			break;
 		case "stop":
 			if(assert_size([2], arg.length, ERROR[2])) return;
 			socket_connection(`${PRE} host stop\n`, callback);
