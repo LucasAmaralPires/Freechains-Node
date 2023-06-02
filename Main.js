@@ -68,7 +68,7 @@ var fs = require("fs");
 
 if(require.main === module)
 {
-	main(process.argv.slice(2),(ans) => {console.log(ans)});
+	main(process.argv.slice(2),(ans) => {process.stdout.write(ans)});
 }
 
 function main (argumentos, callback)
