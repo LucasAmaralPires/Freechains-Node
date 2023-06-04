@@ -76,32 +76,45 @@ async function init_host()
 async function host_path()
 {
 
-    freechains_command_call(["freechains-host", "path", `${P0}`], {Val_cor: "//tmp/8340/", Msn_sucesso: `Host port ${P0} criado`, Msn_erro: `Erro criacao Host port ${P0}`});
-    freechains_command_call(["freechains-host", "path", `${P1}`], {Val_cor: "//tmp/8341/", Msn_sucesso: `Host port ${P1} criado`, Msn_erro: `Erro criacao Host port ${P1}`});
-    freechains_command_call(["freechains-host", "path", `${P2}`], {Val_cor: "//tmp/8342/", Msn_sucesso: `Host port ${P2} criado`, Msn_erro: `Erro criacao Host port ${P2}`});
+    freechains_command_call(["freechains-host", "path", `${P0}`], {Val_cor: "//tmp/8340/", Msn_sucesso: `Host port ${P0} created`, Msn_erro: `Error creating Host port ${P0}`});
+    freechains_command_call(["freechains-host", "path", `${P1}`], {Val_cor: "//tmp/8341/", Msn_sucesso: `Host port ${P1} created`, Msn_erro: `Error creating Host port ${P1}`});
+    freechains_command_call(["freechains-host", "path", `${P2}`], {Val_cor: "//tmp/8342/", Msn_sucesso: `Host port ${P2} created`, Msn_erro: `Error creating Host port ${P2}`});
 
 }
 
 async function test_keys()
 {
 
-    freechains_command_call(["freechains", "keys", "shared", "teste", `${P0}`], {Val_cor: SHA0, Msn_sucesso: "Sucesso criacao shared de teste", Msn_erro: "Erro criacao shared de teste"})
-    freechains_command_call(["freechains", "keys", "pubpvt", "teste", `${P0}`], {Val_cor: PUB0 + " " + PVT0, Msn_sucesso: "Sucesso criacao pubpvt de teste", Msn_erro: "Erro criacao pubpvt de teste"})
+    freechains_command_call(["freechains", "keys", "shared", "teste", `${P0}`], {Val_cor: SHA0, Msn_sucesso: "Success creating shared key -p teste", Msn_erro: "Error creating shared key -p teste"})
+    freechains_command_call(["freechains", "keys", "pubpvt", "teste", `${P0}`], {Val_cor: PUB0 + " " + PVT0, Msn_sucesso: "Success creating pubpvt key -p teste", Msn_erro: "Error creating pubpvt key -p teste"})
 
-    freechains_command_call(["freechains", "keys", "shared", "ola mundo", `${P1}`], {Val_cor: SHA1, Msn_sucesso: "Sucesso criacao shared de ola mundo", Msn_erro: "Erro criacao shared de ola mundo"})
-    freechains_command_call(["freechains", "keys", "pubpvt", "ola mundo", `${P1}`], {Val_cor: PUB1 + " " + PVT1, Msn_sucesso: "Sucesso criacao pubpvt de ola mundo", Msn_erro: "Erro criacao pubpvt de ola mundo"})
+    freechains_command_call(["freechains", "keys", "shared", "ola mundo", `${P1}`], {Val_cor: SHA1, Msn_sucesso: "Success creating shared key -p ola mundo", Msn_erro: "Error creating shared key -p ola mundo"})
+    freechains_command_call(["freechains", "keys", "pubpvt", "ola mundo", `${P1}`], {Val_cor: PUB1 + " " + PVT1, Msn_sucesso: "Success creating pubpvt key -p ola mundo", Msn_erro: "Error creating pubpvt key -p ola mundo"})
 
-    freechains_command_call(["freechains", "keys", "shared", "freechains", `${P2}`], {Val_cor: SHA2, Msn_sucesso: "Sucesso criacao shared de freechains", Msn_erro: "Erro criacao shared de freechains"})
-    freechains_command_call(["freechains", "keys", "pubpvt", "freechains", `${P2}`], {Val_cor: PUB2 + " " + PVT2, Msn_sucesso: "Sucesso criacao pubpvt de freechains", Msn_erro: "Erro criacao pubpvt de freechains"})
+    freechains_command_call(["freechains", "keys", "shared", "freechains", `${P2}`], {Val_cor: SHA2, Msn_sucesso: "Success creating shared key -p freechains", Msn_erro: "Error creating shared key -p freechains"})
+    freechains_command_call(["freechains", "keys", "pubpvt", "freechains", `${P2}`], {Val_cor: PUB2 + " " + PVT2, Msn_sucesso: "Success creating shared key -p freechains", Msn_erro: "Error creating pubpvt key -p freechains"})
+
+}
+
+async function join_chains()
+{
+
+    freechains_command_call(["freechains", "chains", "join", "#teste", PUB0, `${P0}`], {Val_cor: "91DBDFE4573B89C6726F882089649E50EB86D6D3B88E9ADBBB4DC2F718D8DF67", Msn_sucesso: `Success entering chain #teste ${P0}`, Msn_erro: `Error entering chain #teste ${P0}`})
+    freechains_command_call(["freechains", "chains", "join", "#teste", PUB1, `${P1}`], {Val_cor: "1D753166C15465469442F1373ECA58967DE1CB5A658460543F5AA5D4D4E73BED", Msn_sucesso: `Success entering chain #teste ${P1}`, Msn_erro: `Error entering chain #teste ${P1}`})
+    freechains_command_call(["freechains", "chains", "join", "#teste", PUB2, `${P2}`], {Val_cor: "BDB6BE16DC218F94B23FDBD412EA4A8289C299B1AFDC33B136A2F8966EC66AE9", Msn_sucesso: `Success entering chain #teste ${P2}`, Msn_erro: `Error entering chain #teste ${P2}`})
+
+    freechains_command_call(["freechains", "chains", "join", "$chat", SHA0, `${P0}`], {Val_cor: "7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success entering chain $chat ${P0}`, Msn_erro: `Error entering chain $chain ${P0}`})
+    freechains_command_call(["freechains", "chains", "join", "$chat", SHA0, `${P1}`], {Val_cor: "7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success entering chain $chat ${P1}`, Msn_erro: `Error entering chain $chain ${P1}`})
+    freechains_command_call(["freechains", "chains", "join", "$chat", SHA0, `${P2}`], {Val_cor: "7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success entering chain $chat ${P2}`, Msn_erro: `Error entering chain $chain ${P2}`})
 
 }
 
 async function close_host()
 {
 
-    freechains_command_call(["freechains-host", "stop", `${P0}`], {Val_cor: "true", Msn_sucesso: `Host port ${P0} encerrado`, Msn_erro: `Erro encerrar Host port ${P0}`});
-    freechains_command_call(["freechains-host", "stop", `${P1}`], {Val_cor: "true", Msn_sucesso: `Host port ${P1} encerrado`, Msn_erro: `Erro encerrar Host port ${P1}`});
-    freechains_command_call(["freechains-host", "stop", `${P2}`], {Val_cor: "true", Msn_sucesso: `Host port ${P2} encerrado`, Msn_erro: `Erro encerrar Host port ${P2}`});
+    freechains_command_call(["freechains-host", "stop", `${P0}`], {Val_cor: "true", Msn_sucesso: `Host port ${P0} closed`, Msn_erro: `Error closing Host port ${P0}`});
+    freechains_command_call(["freechains-host", "stop", `${P1}`], {Val_cor: "true", Msn_sucesso: `Host port ${P1} closed`, Msn_erro: `Error closing Host port ${P1}`});
+    freechains_command_call(["freechains-host", "stop", `${P2}`], {Val_cor: "true", Msn_sucesso: `Host port ${P2} closed`, Msn_erro: `Error closing Host port ${P2}`});
 
 }
 
@@ -111,7 +124,7 @@ async function run()
 
     init_host()
 
-    await delay(1000)
+    await delay(2000)
 
     console.log("Hosts initiated.")
 
@@ -121,12 +134,51 @@ async function run()
 
     test_keys()
 
-    await delay(1000)
+    await delay(2000)
 
     console.log("Finished crypto keys test.")
+
+    console.log("Joining chains...")
+
+    join_chains()
+
+    await delay (2000)
+
+    console.log("Chains joined.")
 
     close_host()
 
 }
 
 run()
+
+
+/*
+	freechains chains leave <chain>
+	freechains chains list
+	freechains chains listen
+	
+	freechains chain <name> genesis
+	freechains chain <name> heads [blocked]
+	freechains chain <name> get (block | payload) <hash> [file <path>]
+	freechains chain <name> post (inline | file | -) [<path_or_text>]
+	freechains chain <name> (like | dislike) <hash>
+	freechains chain <name> reps <hash_or_pub>
+	freechains chain <name> consensus
+	freechains chain <name> listen
+	
+	freechains peer <addr:port> ping
+	freechains peer <addr:port> chains
+	freechains peer <addr:port> (send | recv) <chain>
+	
+	Options:
+		--help              [none]            displays this help
+		--version           [none]            displays software version
+		--host=<addr:port>  [all]             sets host address and port to connect [default: localhost:8330]
+		--port=<port>       [all]             sets host port to connect [default: 8330]
+		--sign=<pvt>        [post|(dis)like]  signs post with given private key
+		--encrypt           [post]            encrypts post with public key (only in public identity chains)
+		--decrypt=<pvt>     [get]             decrypts post with private key (only in public identity chains)
+		--why=<text>        [(dis)like]       explains reason for the like
+
+*/
