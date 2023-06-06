@@ -303,13 +303,13 @@ function command_freechains (arg, callback)
 					}
 					socket_connection(`${PRE} chain ${chain} post ${sign} ${encrypt} ${pay.length}\n${pay}`, callback);
 					break;
-				case "traverse":
-					let traverse = ""
+				case "consensus":
+					let consensus = ""
 					for (let i = 4; i < arg.length; i++)
 					{
-						traverse += arg[i] + " ";
+						consensus += arg[i] + " ";
 					}
-					socket_connection(`${PRE} chain ${chain} traverse ${traverse}\n`, callback);					
+					socket_connection(`${PRE} chain ${chain} consensus ${consensus}\n`, callback);					
 					break;
 				case "reps":
 					if(assert_size([5], arg.length, ERROR[2])) return;

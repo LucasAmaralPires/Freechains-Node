@@ -109,6 +109,42 @@ async function join_chains()
 
 }
 
+async function chains_list()
+{
+
+    freechains_command_call(["freechains", "chains", "list", `${P0}`], {Val_cor: "$chat #teste", Msn_sucesso: `Success listing chains ${P0}`, Msn_erro: `Error listing chains ${P0}`})
+    freechains_command_call(["freechains", "chains", "list", `${P1}`], {Val_cor: "$chat #teste", Msn_sucesso: `Success listing chains ${P1}`, Msn_erro: `Error listing chains ${P1}`})
+    freechains_command_call(["freechains", "chains", "list", `${P2}`], {Val_cor: "$chat #teste", Msn_sucesso: `Success listing chains ${P2}`, Msn_erro: `Error listing chains ${P2}`})
+
+}
+
+
+async function chains_genesis()
+{
+
+    freechains_command_call(["freechains", "chain", "#teste", "genesis", `${P0}`], {Val_cor: "0_91DBDFE4573B89C6726F882089649E50EB86D6D3B88E9ADBBB4DC2F718D8DF67", Msn_sucesso: `Success genesis hash #teste ${P0}`, Msn_erro: `Error genesis hash #teste ${P0}`})
+    freechains_command_call(["freechains", "chain", "#teste", "genesis", `${P1}`], {Val_cor: "0_1D753166C15465469442F1373ECA58967DE1CB5A658460543F5AA5D4D4E73BED", Msn_sucesso: `Success genesis hash #teste ${P1}`, Msn_erro: `Error genesis hash #teste ${P1}`})
+    freechains_command_call(["freechains", "chain", "#teste", "genesis", `${P2}`], {Val_cor: "0_BDB6BE16DC218F94B23FDBD412EA4A8289C299B1AFDC33B136A2F8966EC66AE9", Msn_sucesso: `Success genesis hash #teste ${P2}`, Msn_erro: `Error genesis hash #teste ${P2}`})
+
+    freechains_command_call(["freechains", "chain", "$chat", "genesis", `${P0}`], {Val_cor: "0_7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success genesis hash $chat ${P0}`, Msn_erro: `Error genesis hash $chain ${P0}`})
+    freechains_command_call(["freechains", "chain", "$chat", "genesis", `${P1}`], {Val_cor: "0_7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success genesis hash $chat ${P1}`, Msn_erro: `Error genesis hash $chain ${P1}`})
+    freechains_command_call(["freechains", "chain", "$chat", "genesis", `${P2}`], {Val_cor: "0_7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success genesis hash $chat ${P2}`, Msn_erro: `Error genesis hash $chain ${P2}`})
+
+}
+
+async function leave_chains()
+{
+
+    freechains_command_call(["freechains", "chains", "leave", "#teste", `${P0}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain #teste ${P0}`, Msn_erro: `Error leaving chain #teste ${P0}`})
+    freechains_command_call(["freechains", "chains", "leave", "#teste", `${P1}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain #teste ${P1}`, Msn_erro: `Error leaving chain #teste ${P1}`})
+    freechains_command_call(["freechains", "chains", "leave", "#teste", `${P2}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain #teste ${P2}`, Msn_erro: `Error leaving chain #teste ${P2}`})
+
+    freechains_command_call(["freechains", "chains", "leave", "$chat", `${P0}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain $chat ${P0}`, Msn_erro: `Error leaving chain $chain ${P0}`})
+    freechains_command_call(["freechains", "chains", "leave", "$chat", `${P1}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain $chat ${P1}`, Msn_erro: `Error leaving chain $chain ${P1}`})
+    freechains_command_call(["freechains", "chains", "leave", "$chat", `${P2}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain $chat ${P2}`, Msn_erro: `Error leaving chain $chain ${P2}`})
+
+}
+
 async function close_host()
 {
 
@@ -146,6 +182,30 @@ async function run()
 
     console.log("Chains joined.")
 
+    console.log("Listing chains...")
+
+    chains_list()
+
+    await delay (2000)
+
+    console.log("Chains listed.")
+
+    console.log("Initianting test of genesis block...")
+
+    chains_genesis()
+
+    await delay (2000)
+
+    console.log("Genesis block ok.")
+
+    console.log("Leaving chains...")
+
+    leave_chains()
+
+    await delay (2000)
+
+    console.log("Chains left.")
+
     close_host()
 
 }
@@ -154,11 +214,8 @@ run()
 
 
 /*
-	freechains chains leave <chain>
-	freechains chains list
 	freechains chains listen
 	
-	freechains chain <name> genesis
 	freechains chain <name> heads [blocked]
 	freechains chain <name> get (block | payload) <hash> [file <path>]
 	freechains chain <name> post (inline | file | -) [<path_or_text>]
