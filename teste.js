@@ -118,6 +118,19 @@ async function chains_list()
 
 }
 
+async function list_chains_peer()
+{
+
+    freechains_command_call(["freechains", "peer", "localhost:8341","chains", `${P0}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P0} Success listing chains of ${P1}`, Msn_erro: `${P0} Error listing chains of ${P1}`})
+    freechains_command_call(["freechains", "peer", "localhost:8342","chains", `${P0}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P0} Success listing chains of ${P2}`, Msn_erro: `${P0} Error listing chains of ${P2}`})
+
+    freechains_command_call(["freechains", "peer", "localhost:8340","chains", `${P1}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P1} Success listing chains of ${P0}`, Msn_erro: `${P1} Error listing chains of ${P0}`})
+    freechains_command_call(["freechains", "peer", "localhost:8342","chains", `${P1}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P1} Success listing chains of ${P2}`, Msn_erro: `${P1} Error listing chains of ${P2}`})
+
+    freechains_command_call(["freechains", "peer", "localhost:8340","chains", `${P2}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P2} Success listing chains of ${P0}`, Msn_erro: `${P2} Error listing chains of ${P0}`})
+    freechains_command_call(["freechains", "peer", "localhost:8341","chains", `${P2}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P2} Success listing chains of ${P1}`, Msn_erro: `${P2} Error listing chains of ${P1}`})
+
+}
 
 async function chains_genesis()
 {
@@ -190,6 +203,14 @@ async function run()
 
     console.log("Chains listed.")
 
+    console.log("Listing peer chains...")
+
+    list_chains_peer()
+
+    await delay (2000)
+
+    console.log("Chains listed.")
+
     console.log("Initianting test of genesis block...")
 
     chains_genesis()
@@ -225,7 +246,6 @@ run()
 	freechains chain <name> listen
 	
 	freechains peer <addr:port> ping
-	freechains peer <addr:port> chains
 	freechains peer <addr:port> (send | recv) <chain>
 	
 	Options:
