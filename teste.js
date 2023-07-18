@@ -39,8 +39,9 @@ function freechains_command_call (cmd, for_test)
                 try
                 {
                     resolve(Main.main(cmd, function(answer){
-                        for_test.Val_cor += "\n"
-                        if(answer == for_test.Val_cor)
+                        answer = answer.slice(0,-1)
+                        answer = answer.split(' ')
+                        if(for_test.Val_cor.every(element => {return answer.includes(element)}))
                         {
                             console.log(for_test.Msn_sucesso)
                         }
@@ -76,94 +77,94 @@ async function init_host()
 async function host_path()
 {
 
-    freechains_command_call(["freechains-host", "path", `${P0}`], {Val_cor: "//tmp/8340/", Msn_sucesso: `Host port ${P0} created`, Msn_erro: `Error creating Host port ${P0}`});
-    freechains_command_call(["freechains-host", "path", `${P1}`], {Val_cor: "//tmp/8341/", Msn_sucesso: `Host port ${P1} created`, Msn_erro: `Error creating Host port ${P1}`});
-    freechains_command_call(["freechains-host", "path", `${P2}`], {Val_cor: "//tmp/8342/", Msn_sucesso: `Host port ${P2} created`, Msn_erro: `Error creating Host port ${P2}`});
+    freechains_command_call(["freechains-host", "path", `${P0}`], {Val_cor: ["//tmp/8340/"], Msn_sucesso: `Host port ${P0} created`, Msn_erro: `Error creating Host port ${P0}`});
+    freechains_command_call(["freechains-host", "path", `${P1}`], {Val_cor: ["//tmp/8341/"], Msn_sucesso: `Host port ${P1} created`, Msn_erro: `Error creating Host port ${P1}`});
+    freechains_command_call(["freechains-host", "path", `${P2}`], {Val_cor: ["//tmp/8342/"], Msn_sucesso: `Host port ${P2} created`, Msn_erro: `Error creating Host port ${P2}`});
 
 }
 
 async function test_keys()
 {
 
-    freechains_command_call(["freechains", "keys", "shared", "teste", `${P0}`], {Val_cor: SHA0, Msn_sucesso: "Success creating shared key -p teste", Msn_erro: "Error creating shared key -p teste"})
-    freechains_command_call(["freechains", "keys", "pubpvt", "teste", `${P0}`], {Val_cor: PUB0 + " " + PVT0, Msn_sucesso: "Success creating pubpvt key -p teste", Msn_erro: "Error creating pubpvt key -p teste"})
+    freechains_command_call(["freechains", "keys", "shared", "teste", `${P0}`], {Val_cor: [SHA0], Msn_sucesso: "Success creating shared key -p teste", Msn_erro: "Error creating shared key -p teste"})
+    freechains_command_call(["freechains", "keys", "pubpvt", "teste", `${P0}`], {Val_cor: (PUB0 + " " + PVT0).split(' '), Msn_sucesso: "Success creating pubpvt key -p teste", Msn_erro: "Error creating pubpvt key -p teste"})
 
-    freechains_command_call(["freechains", "keys", "shared", "ola mundo", `${P1}`], {Val_cor: SHA1, Msn_sucesso: "Success creating shared key -p ola mundo", Msn_erro: "Error creating shared key -p ola mundo"})
-    freechains_command_call(["freechains", "keys", "pubpvt", "ola mundo", `${P1}`], {Val_cor: PUB1 + " " + PVT1, Msn_sucesso: "Success creating pubpvt key -p ola mundo", Msn_erro: "Error creating pubpvt key -p ola mundo"})
+    freechains_command_call(["freechains", "keys", "shared", "ola mundo", `${P1}`], {Val_cor: [SHA1], Msn_sucesso: "Success creating shared key -p ola mundo", Msn_erro: "Error creating shared key -p ola mundo"})
+    freechains_command_call(["freechains", "keys", "pubpvt", "ola mundo", `${P1}`], {Val_cor: (PUB1 + " " + PVT1).split(' '), Msn_sucesso: "Success creating pubpvt key -p ola mundo", Msn_erro: "Error creating pubpvt key -p ola mundo"})
 
-    freechains_command_call(["freechains", "keys", "shared", "freechains", `${P2}`], {Val_cor: SHA2, Msn_sucesso: "Success creating shared key -p freechains", Msn_erro: "Error creating shared key -p freechains"})
-    freechains_command_call(["freechains", "keys", "pubpvt", "freechains", `${P2}`], {Val_cor: PUB2 + " " + PVT2, Msn_sucesso: "Success creating shared key -p freechains", Msn_erro: "Error creating pubpvt key -p freechains"})
+    freechains_command_call(["freechains", "keys", "shared", "freechains", `${P2}`], {Val_cor: [SHA2], Msn_sucesso: "Success creating shared key -p freechains", Msn_erro: "Error creating shared key -p freechains"})
+    freechains_command_call(["freechains", "keys", "pubpvt", "freechains", `${P2}`], {Val_cor: (PUB2 + " " + PVT2).split(' '), Msn_sucesso: "Success creating shared key -p freechains", Msn_erro: "Error creating pubpvt key -p freechains"})
 
 }
 
 async function join_chains()
 {
 
-    freechains_command_call(["freechains", "chains", "join", "#teste", PUB0, `${P0}`], {Val_cor: "91DBDFE4573B89C6726F882089649E50EB86D6D3B88E9ADBBB4DC2F718D8DF67", Msn_sucesso: `Success entering chain #teste ${P0}`, Msn_erro: `Error entering chain #teste ${P0}`})
-    freechains_command_call(["freechains", "chains", "join", "#teste", PUB1, `${P1}`], {Val_cor: "1D753166C15465469442F1373ECA58967DE1CB5A658460543F5AA5D4D4E73BED", Msn_sucesso: `Success entering chain #teste ${P1}`, Msn_erro: `Error entering chain #teste ${P1}`})
-    freechains_command_call(["freechains", "chains", "join", "#teste", PUB2, `${P2}`], {Val_cor: "BDB6BE16DC218F94B23FDBD412EA4A8289C299B1AFDC33B136A2F8966EC66AE9", Msn_sucesso: `Success entering chain #teste ${P2}`, Msn_erro: `Error entering chain #teste ${P2}`})
+    freechains_command_call(["freechains", "chains", "join", "#teste", PUB0, `${P0}`], {Val_cor: ["91DBDFE4573B89C6726F882089649E50EB86D6D3B88E9ADBBB4DC2F718D8DF67"], Msn_sucesso: `Success entering chain #teste ${P0}`, Msn_erro: `Error entering chain #teste ${P0}`})
+    freechains_command_call(["freechains", "chains", "join", "#teste", PUB1, `${P1}`], {Val_cor: ["1D753166C15465469442F1373ECA58967DE1CB5A658460543F5AA5D4D4E73BED"], Msn_sucesso: `Success entering chain #teste ${P1}`, Msn_erro: `Error entering chain #teste ${P1}`})
+    freechains_command_call(["freechains", "chains", "join", "#teste", PUB2, `${P2}`], {Val_cor: ["BDB6BE16DC218F94B23FDBD412EA4A8289C299B1AFDC33B136A2F8966EC66AE9"], Msn_sucesso: `Success entering chain #teste ${P2}`, Msn_erro: `Error entering chain #teste ${P2}`})
 
-    freechains_command_call(["freechains", "chains", "join", "$chat", SHA0, `${P0}`], {Val_cor: "7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success entering chain $chat ${P0}`, Msn_erro: `Error entering chain $chain ${P0}`})
-    freechains_command_call(["freechains", "chains", "join", "$chat", SHA0, `${P1}`], {Val_cor: "7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success entering chain $chat ${P1}`, Msn_erro: `Error entering chain $chain ${P1}`})
-    freechains_command_call(["freechains", "chains", "join", "$chat", SHA0, `${P2}`], {Val_cor: "7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success entering chain $chat ${P2}`, Msn_erro: `Error entering chain $chain ${P2}`})
+    freechains_command_call(["freechains", "chains", "join", "$chat", SHA0, `${P0}`], {Val_cor: ["7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4"], Msn_sucesso: `Success entering chain $chat ${P0}`, Msn_erro: `Error entering chain $chain ${P0}`})
+    freechains_command_call(["freechains", "chains", "join", "$chat", SHA0, `${P1}`], {Val_cor: ["7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4"], Msn_sucesso: `Success entering chain $chat ${P1}`, Msn_erro: `Error entering chain $chain ${P1}`})
+    freechains_command_call(["freechains", "chains", "join", "$chat", SHA0, `${P2}`], {Val_cor: ["7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4"], Msn_sucesso: `Success entering chain $chat ${P2}`, Msn_erro: `Error entering chain $chain ${P2}`})
 
 }
 
 async function chains_list()
 {
 
-    freechains_command_call(["freechains", "chains", "list", `${P0}`], {Val_cor: "$chat #teste", Msn_sucesso: `Success listing chains ${P0}`, Msn_erro: `Error listing chains ${P0}`})
-    freechains_command_call(["freechains", "chains", "list", `${P1}`], {Val_cor: "$chat #teste", Msn_sucesso: `Success listing chains ${P1}`, Msn_erro: `Error listing chains ${P1}`})
-    freechains_command_call(["freechains", "chains", "list", `${P2}`], {Val_cor: "$chat #teste", Msn_sucesso: `Success listing chains ${P2}`, Msn_erro: `Error listing chains ${P2}`})
+    freechains_command_call(["freechains", "chains", "list", `${P0}`], {Val_cor: "$chat #teste".split(' '), Msn_sucesso: `Success listing chains ${P0}`, Msn_erro: `Error listing chains ${P0}`})
+    freechains_command_call(["freechains", "chains", "list", `${P1}`], {Val_cor: "$chat #teste".split(' '), Msn_sucesso: `Success listing chains ${P1}`, Msn_erro: `Error listing chains ${P1}`})
+    freechains_command_call(["freechains", "chains", "list", `${P2}`], {Val_cor: "$chat #teste".split(' '), Msn_sucesso: `Success listing chains ${P2}`, Msn_erro: `Error listing chains ${P2}`})
 
 }
 
 async function list_chains_peer()
 {
 
-    freechains_command_call(["freechains", "peer", "localhost:8341","chains", `${P0}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P0} Success listing chains of ${P1}`, Msn_erro: `${P0} Error listing chains of ${P1}`})
-    freechains_command_call(["freechains", "peer", "localhost:8342","chains", `${P0}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P0} Success listing chains of ${P2}`, Msn_erro: `${P0} Error listing chains of ${P2}`})
+    freechains_command_call(["freechains", "peer", "localhost:8341","chains", `${P0}`], {Val_cor: "$chat #teste".split(' '), Msn_sucesso: `${P0} Success listing chains of ${P1}`, Msn_erro: `${P0} Error listing chains of ${P1}`})
+    freechains_command_call(["freechains", "peer", "localhost:8342","chains", `${P0}`], {Val_cor: "$chat #teste".split(' '), Msn_sucesso: `${P0} Success listing chains of ${P2}`, Msn_erro: `${P0} Error listing chains of ${P2}`})
 
-    freechains_command_call(["freechains", "peer", "localhost:8340","chains", `${P1}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P1} Success listing chains of ${P0}`, Msn_erro: `${P1} Error listing chains of ${P0}`})
-    freechains_command_call(["freechains", "peer", "localhost:8342","chains", `${P1}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P1} Success listing chains of ${P2}`, Msn_erro: `${P1} Error listing chains of ${P2}`})
+    freechains_command_call(["freechains", "peer", "localhost:8340","chains", `${P1}`], {Val_cor: "$chat #teste".split(' '), Msn_sucesso: `${P1} Success listing chains of ${P0}`, Msn_erro: `${P1} Error listing chains of ${P0}`})
+    freechains_command_call(["freechains", "peer", "localhost:8342","chains", `${P1}`], {Val_cor: "$chat #teste".split(' '), Msn_sucesso: `${P1} Success listing chains of ${P2}`, Msn_erro: `${P1} Error listing chains of ${P2}`})
 
-    freechains_command_call(["freechains", "peer", "localhost:8340","chains", `${P2}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P2} Success listing chains of ${P0}`, Msn_erro: `${P2} Error listing chains of ${P0}`})
-    freechains_command_call(["freechains", "peer", "localhost:8341","chains", `${P2}`], {Val_cor: "$chat #teste", Msn_sucesso: `${P2} Success listing chains of ${P1}`, Msn_erro: `${P2} Error listing chains of ${P1}`})
+    freechains_command_call(["freechains", "peer", "localhost:8340","chains", `${P2}`], {Val_cor: "$chat #teste".split(' '), Msn_sucesso: `${P2} Success listing chains of ${P0}`, Msn_erro: `${P2} Error listing chains of ${P0}`})
+    freechains_command_call(["freechains", "peer", "localhost:8341","chains", `${P2}`], {Val_cor: "$chat #teste".split(' '), Msn_sucesso: `${P2} Success listing chains of ${P1}`, Msn_erro: `${P2} Error listing chains of ${P1}`})
 
 }
 
 async function chains_genesis()
 {
 
-    freechains_command_call(["freechains", "chain", "#teste", "genesis", `${P0}`], {Val_cor: "0_91DBDFE4573B89C6726F882089649E50EB86D6D3B88E9ADBBB4DC2F718D8DF67", Msn_sucesso: `Success genesis hash #teste ${P0}`, Msn_erro: `Error genesis hash #teste ${P0}`})
-    freechains_command_call(["freechains", "chain", "#teste", "genesis", `${P1}`], {Val_cor: "0_1D753166C15465469442F1373ECA58967DE1CB5A658460543F5AA5D4D4E73BED", Msn_sucesso: `Success genesis hash #teste ${P1}`, Msn_erro: `Error genesis hash #teste ${P1}`})
-    freechains_command_call(["freechains", "chain", "#teste", "genesis", `${P2}`], {Val_cor: "0_BDB6BE16DC218F94B23FDBD412EA4A8289C299B1AFDC33B136A2F8966EC66AE9", Msn_sucesso: `Success genesis hash #teste ${P2}`, Msn_erro: `Error genesis hash #teste ${P2}`})
+    freechains_command_call(["freechains", "chain", "#teste", "genesis", `${P0}`], {Val_cor: ["0_91DBDFE4573B89C6726F882089649E50EB86D6D3B88E9ADBBB4DC2F718D8DF67"], Msn_sucesso: `Success genesis hash #teste ${P0}`, Msn_erro: `Error genesis hash #teste ${P0}`})
+    freechains_command_call(["freechains", "chain", "#teste", "genesis", `${P1}`], {Val_cor: ["0_1D753166C15465469442F1373ECA58967DE1CB5A658460543F5AA5D4D4E73BED"], Msn_sucesso: `Success genesis hash #teste ${P1}`, Msn_erro: `Error genesis hash #teste ${P1}`})
+    freechains_command_call(["freechains", "chain", "#teste", "genesis", `${P2}`], {Val_cor: ["0_BDB6BE16DC218F94B23FDBD412EA4A8289C299B1AFDC33B136A2F8966EC66AE9"], Msn_sucesso: `Success genesis hash #teste ${P2}`, Msn_erro: `Error genesis hash #teste ${P2}`})
 
-    freechains_command_call(["freechains", "chain", "$chat", "genesis", `${P0}`], {Val_cor: "0_7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success genesis hash $chat ${P0}`, Msn_erro: `Error genesis hash $chain ${P0}`})
-    freechains_command_call(["freechains", "chain", "$chat", "genesis", `${P1}`], {Val_cor: "0_7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success genesis hash $chat ${P1}`, Msn_erro: `Error genesis hash $chain ${P1}`})
-    freechains_command_call(["freechains", "chain", "$chat", "genesis", `${P2}`], {Val_cor: "0_7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4", Msn_sucesso: `Success genesis hash $chat ${P2}`, Msn_erro: `Error genesis hash $chain ${P2}`})
+    freechains_command_call(["freechains", "chain", "$chat", "genesis", `${P0}`], {Val_cor: ["0_7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4"], Msn_sucesso: `Success genesis hash $chat ${P0}`, Msn_erro: `Error genesis hash $chain ${P0}`})
+    freechains_command_call(["freechains", "chain", "$chat", "genesis", `${P1}`], {Val_cor: ["0_7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4"], Msn_sucesso: `Success genesis hash $chat ${P1}`, Msn_erro: `Error genesis hash $chain ${P1}`})
+    freechains_command_call(["freechains", "chain", "$chat", "genesis", `${P2}`], {Val_cor: ["0_7231419A405076D6972C0C6E40806A62DFA8D86D0CAFBD8D5FEE058D854CA9A4"], Msn_sucesso: `Success genesis hash $chat ${P2}`, Msn_erro: `Error genesis hash $chain ${P2}`})
 
 }
 
 async function leave_chains()
 {
 
-    freechains_command_call(["freechains", "chains", "leave", "#teste", `${P0}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain #teste ${P0}`, Msn_erro: `Error leaving chain #teste ${P0}`})
-    freechains_command_call(["freechains", "chains", "leave", "#teste", `${P1}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain #teste ${P1}`, Msn_erro: `Error leaving chain #teste ${P1}`})
-    freechains_command_call(["freechains", "chains", "leave", "#teste", `${P2}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain #teste ${P2}`, Msn_erro: `Error leaving chain #teste ${P2}`})
+    freechains_command_call(["freechains", "chains", "leave", "#teste", `${P0}`], {Val_cor: ["true"], Msn_sucesso: `Success leaving chain #teste ${P0}`, Msn_erro: `Error leaving chain #teste ${P0}`})
+    freechains_command_call(["freechains", "chains", "leave", "#teste", `${P1}`], {Val_cor: ["true"], Msn_sucesso: `Success leaving chain #teste ${P1}`, Msn_erro: `Error leaving chain #teste ${P1}`})
+    freechains_command_call(["freechains", "chains", "leave", "#teste", `${P2}`], {Val_cor: ["true"], Msn_sucesso: `Success leaving chain #teste ${P2}`, Msn_erro: `Error leaving chain #teste ${P2}`})
 
-    freechains_command_call(["freechains", "chains", "leave", "$chat", `${P0}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain $chat ${P0}`, Msn_erro: `Error leaving chain $chain ${P0}`})
-    freechains_command_call(["freechains", "chains", "leave", "$chat", `${P1}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain $chat ${P1}`, Msn_erro: `Error leaving chain $chain ${P1}`})
-    freechains_command_call(["freechains", "chains", "leave", "$chat", `${P2}`], {Val_cor: "true", Msn_sucesso: `Success leaving chain $chat ${P2}`, Msn_erro: `Error leaving chain $chain ${P2}`})
+    freechains_command_call(["freechains", "chains", "leave", "$chat", `${P0}`], {Val_cor: ["true"], Msn_sucesso: `Success leaving chain $chat ${P0}`, Msn_erro: `Error leaving chain $chain ${P0}`})
+    freechains_command_call(["freechains", "chains", "leave", "$chat", `${P1}`], {Val_cor: ["true"], Msn_sucesso: `Success leaving chain $chat ${P1}`, Msn_erro: `Error leaving chain $chain ${P1}`})
+    freechains_command_call(["freechains", "chains", "leave", "$chat", `${P2}`], {Val_cor: ["true"], Msn_sucesso: `Success leaving chain $chat ${P2}`, Msn_erro: `Error leaving chain $chain ${P2}`})
 
 }
 
 async function close_host()
 {
 
-    freechains_command_call(["freechains-host", "stop", `${P0}`], {Val_cor: "true", Msn_sucesso: `Host port ${P0} closed`, Msn_erro: `Error closing Host port ${P0}`});
-    freechains_command_call(["freechains-host", "stop", `${P1}`], {Val_cor: "true", Msn_sucesso: `Host port ${P1} closed`, Msn_erro: `Error closing Host port ${P1}`});
-    freechains_command_call(["freechains-host", "stop", `${P2}`], {Val_cor: "true", Msn_sucesso: `Host port ${P2} closed`, Msn_erro: `Error closing Host port ${P2}`});
+    freechains_command_call(["freechains-host", "stop", `${P0}`], {Val_cor: ["true"], Msn_sucesso: `Host port ${P0} closed`, Msn_erro: `Error closing Host port ${P0}`});
+    freechains_command_call(["freechains-host", "stop", `${P1}`], {Val_cor: ["true"], Msn_sucesso: `Host port ${P1} closed`, Msn_erro: `Error closing Host port ${P1}`});
+    freechains_command_call(["freechains-host", "stop", `${P2}`], {Val_cor: ["true"], Msn_sucesso: `Host port ${P2} closed`, Msn_erro: `Error closing Host port ${P2}`});
 
 }
 

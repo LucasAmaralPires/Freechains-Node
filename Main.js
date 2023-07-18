@@ -1,6 +1,6 @@
 const MAJOR    = "0";
 const MINOR    = "10";
-const REVISION = "0";
+const REVISION = "1";
 const VERSION  = "v" + MAJOR + "." + MINOR + "." + REVISION;
 const PRE      = "FC " + VERSION;
 const ERROR	   = ["Sucess", "Command not recognized", "Invalid Number of Arguments", "Invalid Port Number", "Unable to Read File", "Need private key"];
